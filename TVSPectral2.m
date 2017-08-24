@@ -1,15 +1,28 @@
 clear all; 
 eeglab;
 
-dataPath = '/home/biomechman/Documents/data/P22_S2_JessicaJones_Block.edf'; % To the data files.
-channelPath = '/home/biomechman/Documents/MATLAB/eeglab14_1_1b/64cap.ced'; % To EEG cap configuratin file.
+dataPath = uigetdir('Choose the directory containing data files'); % To the data files.
+channelPath = strcat(uigetdir('Choose the directory cotaining EEG cap config file'), '/64cap.ced'); % To EEG cap configuratin file.
 channels = {'FP1' 'FP2' 'F7' 'F3' 'FZ' 'F4' 'F8' 'C3' 'CZ' 'C4' 'P3' 'P4' 'O1' 'O2'}; % Channels used.
+
+files = dir('*.edf'); % Loads all .edf data files.
+subNum = [1:length(files)]; % Creates array with subject numbers.
+sesNum = 2 % Number of sessions.
+typeCond = {'Baseline' 'JessicaJones' 'KillerWomen'}; % Dictionary with the condition type.
+
+for i = 1:length(files)
+    for j = 1:length(subNum)
+        for k = 1:sesNum
+            filePath = strcat('P',str(j)
+        end
+    end
+end
 
 % Load and process data set
 EEG = pop_biosig(dataPath, 'importevent','off','importannot','off');
 [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0,'gui','off');
 EEG = eeg_checkset(pop_eegfiltnew(eeg_checkset(eeg_regepochs(eeg_checkset(EEG))), 4, 35, 1650, 0, [], 0));
-EEG = pop_chanedit(EEG, 'lookup',channelPath);
+EEG = pop_chanedit(EEG, 'lookup',filePath);
 [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
 EEG = eeg_checkset(pop_reref(pop_select(eeg_checkset(EEG),'channel',channels), []));
 data = EEG.data;
