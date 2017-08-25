@@ -18,15 +18,16 @@ for file = files
     for j = 1:length(subNum)
         for k = 1:length(sesNum)
             for l = 1:length(typeCond)
-                builtName = strcat('P',string(subNum(j)),'_S',string(sesNum(k)),'_',typeCond(l),'_Block');
-                filePath = strcat(dataPath,'/',builtName,'.edf');
-                fprintf(strcat('\n',filePath,'\n\n'))
+                builtName = strcat('P',num2str(subNum(j)),'_S',num2str(sesNum(k)),'_',typeCond(l),'_Block');
+                filePath = strcat(dataPath,'/',builtName,'.edf'); % NOTE: filePath is a CELL. Need to convert to character later using char().
+                fprintf(strcat('\n',string(filePath),'\n\n'))
 
                 % Load and process data set
-                EEG = pop_biosig(dataPath, 'importevent','off','importannot','off');
+                
+                EEG = pop_biosig(char(filePath), 'importevent','off','importannot','off');
                 [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0,'gui','off');
                 EEG = eeg_checkset(pop_eegfiltnew(eeg_checkset(eeg_regepochs(eeg_checkset(EEG))), 4, 35, 1650, 0, [], 0));
-                EEG = pop_chanedit(EEG, 'lookup',filePath);
+                EEG = pop_chanedit(EEG, 'lookup',char(filePath));
                 [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);
                 EEG = eeg_checkset(pop_reref(pop_select(eeg_checkset(EEG),'channel',channels), []));
                 data = EEG.data;
@@ -70,9 +71,6 @@ for file = files
                     xlswrite(writePath,baseline,1,'K4');
                     xlswrite(writePath,Engagement,1,'Z4');
                 end
-                
-                xlswrite('/home/biomechman/Documents/data/test.xls',Engagement,1,'Z4') %Fix, comment, add another, check
-
             end
         end
     end
