@@ -1,18 +1,19 @@
 clear all; 
 eeglab;
 
-% This script will open two prompts asking for a folder. The first folder
-% must be the folder in which your data files are, and is also where the
-% output will be saved. The second folder must be one that contains the EEG
-% cap electrode/channels configuration.
-
-dataPath = uigetdir('Choose the directory containing data files'); % To the data files.
+dataPath = pwd; % To the data files.
 channelPath = strcat(uigetdir('Choose the directory cotaining EEG cap config file'), '/64cap.ced'); % To EEG cap configuratin file.
 channels = {'FP1' 'FP2' 'F7' 'F3' 'FZ' 'F4' 'F8' 'C3' 'CZ' 'C4' 'P3' 'P4' 'O1' 'O2'}; % Channels used.
 
 files = dir('*.edf'); % Loads all .edf data files.
 typeCond = {'Baseline' 'JessicaJones' 'KillerWomen'}; % Dictionary with the condition type.
 exceptions = {'P25_S1' 'P13_S2' 'P05_S2'}; % List of Patient & Session names (P##_S#) that should be skipped. Must be populated by hand.
+
+% If you have file exceptions, skip the FOR loop and name the file
+% manualy. Everything else remains the same. Comment out the fileName = ...
+% below when not using it!
+
+% fileName = 'P02_S2_JessicaJones_Block.edf';
 
 for file = files'
     fileName = file.name;
@@ -34,8 +35,8 @@ for file = files'
     data = EEG.data;
     
     for i = 1:length(data(1,1,:))
-        [spectra,freqs,speccomp,contrib,specstd] = spectopo(data(:,:,i), 0, 1000, 'freqrange',[4 35], 'plot', 'off');
-        PowerSpec(:,:,i) = spectra; % Power Spectrum - PowerSpec(power at index channel,frequency,epoch)
+        [spectra,freqs,speccomp,contrib,specstd] = spectopo(data(:,:,i), 0, EEG.srate, 'freqrange',[4 35], 'plot', 'off');
+        PowerSpec(:,:,i) = 10.^(spectra/10); % Power Spectrum - PowerSpec(power at index channel,frequency,epoch)
     end
     
     for i = 1:length(PowerSpec(1,1,:))
@@ -66,13 +67,13 @@ for file = files'
         clear Engagement
         clear Asymmetry
     elseif condition == string(typeCond(2)) % Write to Jessica Jones .xls file.
-        writePath = strcat(dataPath,'/',fileName(1:6),'_JJ_Engagement.xls');
+        writePath = strcat(dataPath,'/',fileName(1:6),'_JJ_Engagement.xlsx');
         xlswrite(writePath,baseline,1,'K4');
         xlswrite(writePath,Engagement,1,'Z4');
         clear Engagement
         clear Asymmetry
-    else % Write to Killer Women .xls file.
-        writePath = strcat(dataPath,'/',fileName(1:6),'_KW_Engagement.xls');
+    elseif condition == string(typeCond(3)) % Write to Killer Women .xls file.
+        writePath = strcat(dataPath,'/',fileName(1:6),'_KW_Engagement.xlsx');
         xlswrite(writePath,baseline,1,'K4');
         xlswrite(writePath,Engagement,1,'Z4');
         clear Engagement
@@ -80,3 +81,20 @@ for file = files'
     end
 end
 
+fprintf('░░░░░░░░░░░░░░▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄░░░░░░░░░░░░░░\n')
+fprintf('░░░░░░░▄▄▄▄█▀▀▀░░░░░░░░░░░░▀▀██░░░░░░░░░░░░\n')
+fprintf('░░░░▄███▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█▄▄▄░░░░░░░░\n')
+fprintf('░░▄▀▀░█░░░░▀█▄▀▄▀██████░▀█▄▀▄▀████▀░░░░░░░░\n')
+fprintf('░░█░░░█░░░░░░▀█▄█▄███▀░░░░▀▀▀▀▀▀▀░▀▀▄░░░░░░\n')
+fprintf('░░█░░░█░▄▄▄░░░░░░░░░░░░░░░░░░░░░▀▀░░░█░░░░░\n')
+fprintf('░░█░░░▀█░░█░░░░▄░░░░▄░░░░░▀███▀░░░░░░░█░░░░\n')
+fprintf('░░█░░░░█░░▀▄░░░░░░▄░░░░░░░░░█░░░░░░░░█▀▄░░░\n')
+fprintf('░░░▀▄▄▀░░░░░▀▀▄▄▄░░░░░░░▄▄▄▀░▀▄▄▄▄▄▀▀░░█░░░\n')
+fprintf('░░░█▄░░░░░░░░░░░░▀▀▀▀▀▀▀░░░░░░░░░░░░░░█░░░░\n')
+fprintf('░░░░█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▄██░░░░░\n')
+fprintf('░░░░▀█▄░░░░░░░░░░░░░░░░░░░░░░░░░▄▀▀░░░▀█░░░\n')
+fprintf('█▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀█\n')
+fprintf('█░█▀▄ █▀▀ █▀█ █░░░░█░▄░█ █ ▀█▀ █░█░░█ ▀█▀░█\n')
+fprintf('█░█░█ █▀▀ █▀█ █░░░░▀▄▀▄▀ █ ░█░ █▀█░░█ ░█░░█\n')
+fprintf('█░▀▀░ ▀▀▀ ▀░▀ ▀▀▀░░░▀░▀░ ▀ ░▀░ ▀░▀░░▀ ░▀░░█\n')
+fprintf('▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀\n')
