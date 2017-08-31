@@ -64,20 +64,18 @@ for file = files'
     
     if condition == string(typeCond(1)) % save Baseline data. Careful here! Baseline must come first and will be assigned to the following condition.
         baseline = Engagement;
-        clear Engagement
-        clear Asymmetry
+        clear Engagement Asymmetry PowerSpec Alpha Beta Delta Theta
     elseif condition == string(typeCond(2)) % Write to Jessica Jones .xls file.
         writePath = strcat(dataPath,'/',fileName(1:6),'_JJ_Engagement.xlsx');
         xlswrite(writePath,baseline,1,'K4');
         xlswrite(writePath,Engagement,1,'Z4');
-        clear Engagement
-        clear Asymmetry
+        clear Engagement Asymmetry baseline PowerSpec Alpha Beta Delta Theta
     elseif condition == string(typeCond(3)) % Write to Killer Women .xls file.
         writePath = strcat(dataPath,'/',fileName(1:6),'_KW_Engagement.xlsx');
         xlswrite(writePath,baseline,1,'K4');
         xlswrite(writePath,Engagement,1,'Z4');
-        clear Engagement
-        clear Asymmetry
+        clear Engagement Asymmetry baseline PowerSpec Alpha Beta Delta Theta
+
     end
 end
  
