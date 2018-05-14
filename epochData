@@ -1,15 +1,16 @@
-rawpath =  'C:\Users\immersyve\Documents\Golf\Preprocessed\epochRenamed';
-savepath = 'C:\Users\immersyve\Documents\Golf\Preprocessed\epoched';
+rawpath =  'D:\Golf\PreProcessedFiles\2-interpolate';
+savepath = 'D:\Golf\PreProcessedFiles\3-epoched';
 triggers = {'500', '700'};
 
 cd(rawpath);
 files = dir('*.set');
 
 for file = files'
-     EEG = pop_loadset( 'filename', file.name, 'filepath', rawpath);
-     EEG = pop_epoch( EEG, triggers, [-1.0 1.0], 'newname', strcat(file.name,'epochs'), 'epochinfo', 'yes');
-     EEG = pop_rmbase( EEG, [-200    0]);
-     EEG.setname='epochs';
-     EEG = pop_saveset( EEG,  'filename', strcat(file.name,'_epochs'), 'filepath', savepath);
+     EEG = pop_loadset('filename', file.name, 'filepath', rawpath);
+     EEG = pop_epoch(EEG, triggers, [-1.0 .250], 'newname', strcat(file.name(1:8),'_epochs'), 'epochinfo', 'yes');
+     EEG = pop_rmbase(EEG, [-200    0]);
+     EEG.setname = 'epochs';
+     sufix = strcat(num2str(length(EEG.epoch)),'_epochs');
+     EEG = pop_saveset(EEG, 'filename', strcat(file.name(1:9),sufix), 'filepath', savepath);
      clear('EEG')
-  end
+end
