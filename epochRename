@@ -1,0 +1,28 @@
+FILES = dir('*.cnt');
+path = pwd;
+file = FILES';
+
+for i = 1:length(file)
+    try
+    EEG = pop_loadcnt([path '\' file(i).name], 'dataformat', 'auto', 'memmapfile', '', 'keystroke', 'on');
+    filename = split(file(i).name,'.cnt');
+        for j = 1:length(EEG.event)
+            if (strcmp((class(EEG.event(j).type)),'char')) == 1
+                EEG.event(j).type = str2double(EEG.event(j).type);
+            end
+            
+            if (EEG.event(j).type == 160) == 1
+                % Putt Missed
+                EEG.event(j-1).type = 500;
+            end
+            
+            if (EEG.event(j).type == 192) == 1
+                % Putt Made
+                EEG.event(j-1).type = 700;
+            end
+        end
+        EEG = eeg_checkset(EEG, 'eventconsistency');
+        EEG = pop_saveset( EEG, 'filename',strcat(filename{1},'.set'),'filepath',strcat(pwd,filesep,'epochRenamed'));
+    catch   
+    end
+end
